@@ -5,15 +5,25 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body style="background-color: lightgray;">
-        <div id="report-banner">Report a problem</div>
+        <div id="report-banner">
+            <h1>Report a Problem</h1>
+            <div id="nav-links">
+                <a href="#" onclick="sendReq('/Home')">Home</a>
+            </div>
+          
+        </div>
         <div id="main-content">
-            <form action="submit_report" method="POST">
-                <label for="name">Name:</label><br>
-                <input type="text" id="name" name="name"><br><br>
-                <label for="email">Email:</label><br>
-                <input type="email" id="email" name="email"><br><br>
-                <input type="submit" value="Submit">
-            </form>
+            <div class="form-container">
+                <form action="submit_report" method="POST">
+                    <label for="name">Name:</label><br>
+                    <input type="text" id="name" name="name"><br><br>
+                    <label for="email">Email:</label><br>
+                    <input type="email" id="email" name="email"><br><br>
+                    <label for="message">Message:</label><br><br>
+                    <textarea id="message" name="message"></textarea><br><br>
+                    <input type="submit" value="Submit">
+                </form>
+            </div>        
         </div>
     </body>
 </html>
