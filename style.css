@@ -1,0 +1,22 @@
+#report-banner{
+    background-color: lightgreen;
+    color: black;
+    top: 0;
+    left: 0;
+    font-size: 30px;
+    width: 100%;
+    height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    z-index: 1000;
+}
+body{
+    background-color: lightgray;
+    margin: 0;
+}
+#main-content{
+    margin-top: 10vh;
+    padding: 20px;
+}

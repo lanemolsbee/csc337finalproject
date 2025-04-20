@@ -1,4 +1,19 @@
 <!DOCTYPE html>
 <html>
-
+    <head>
+        <title>Report a Problem</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body style="background-color: lightgray;">
+        <div id="report-banner">Report a problem</div>
+        <div id="main-content">
+            <form action="submit_report" method="POST">
+                <label for="name">Name:</label><br>
+                <input type="text" id="name" name="name"><br><br>
+                <label for="email">Email:</label><br>
+                <input type="email" id="email" name="email"><br><br>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
+    </body>
 </html>
