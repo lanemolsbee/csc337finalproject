@@ -1,8 +1,18 @@
+/**
+ * File: server.js
+ * Author: Lane Molsbee
+ * Purpose: This file contains the bulk of the server code and keeps track of serving the dynamic
+ * files. It imports various modules needed to run the server including the modules for http, url,
+ * file system, querystrings, password authorization, database interactions, and the database itself
+ * 
+ * This server makes use of a MongoDB database to store user information.
+ */
 var http = require('http')
 var url = require('url')
 var fs = require('fs')
 var qs = require('querystring')
 var auth = require('./auth.js')
+var database = require('/database.js')
 var {MongoClient} = require('mongodb')
 var client = new MongoClient('mongodb://localhost:27017/userDB');
 let db;
