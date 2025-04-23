@@ -26,6 +26,21 @@ function getHTMLContent(fileName){
     }
 }
 
+function updateUrls(){
+    var username = window.localStorage.getItem('username')
+    var role = window.localStorage.getItem("role")
+    if(username!=null && role!=null){
+        var alist = document.getElementsByTagName('a')
+        for(var i=0;i<alist.length;i++)
+        {
+            var par = '?username=' + username + "&role=" + role;
+            alist[i].href += par
+        }
+    }
+}
+
+
+
 async function startServer(){
     try{
         await client.connect()
