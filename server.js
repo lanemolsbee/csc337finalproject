@@ -1,11 +1,12 @@
 var http = require('http')
 var url = require('url')
 var fs = require('fs')
-var crypto = require('crypto')
 var qs = require('querystring')
+var auth = require('./auth.js')
 var {MongoClient} = require('mongodb')
 var client = new MongoClient('mongodb://localhost:27017/userDB');
 let db;
+
 async function startServer(){
     try{
         await client.connect()
