@@ -17,6 +17,12 @@ var {MongoClient} = require('mongodb')
 var client = new MongoClient('mongodb://localhost:27017/userDB');
 let db;
 
+/**
+ * This function synchronously reads the contents of fileName and returns those contents
+ * if the file name exists, and null otherwise
+ * @param {String} fileName 
+ * @returns - String giving the contents of fileName
+ */
 function getHTMLContent(fileName){
     try{
         return fs.readFileSync(fileName, {'encoding':'utf8'});
@@ -25,7 +31,9 @@ function getHTMLContent(fileName){
         return null;
     }
 }
-
+/**
+ * This function updates the URLs for all the links on a page. 
+ */
 function updateUrls(){
     var username = window.localStorage.getItem('username')
     var role = window.localStorage.getItem("role")
@@ -38,7 +46,12 @@ function updateUrls(){
         }
     }
 }
-
+/**
+ * This function consolidates the task of sending responses so the code in it is not
+ * repeated throughout the server. 
+ * @param {http.ServerResponse} res - the response object
+ * @param {String} htmlContent - a string giving the HTML content of the file
+ */
 function resEnd(res, htmlContent){
     if(htmlContent){
         res.end(htmlContent);
@@ -47,7 +60,10 @@ function resEnd(res, htmlContent){
     }
 }
 
-
+/**
+ * This function acts as a wrapper for starting the server and connecting
+ * the server to the MongoDB database
+ */
 async function startServer(){
     try{
         await client.connect()
