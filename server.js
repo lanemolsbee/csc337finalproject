@@ -12,7 +12,7 @@ var url = require('url')
 var fs = require('fs')
 var qs = require('querystring')
 var auth = require('./auth.js')
-var database = require('/database.js')
+var database = require('./database.js')
 var {MongoClient} = require('mongodb')
 var client = new MongoClient('mongodb://localhost:27017/userDB');
 let db;
@@ -39,6 +39,13 @@ function updateUrls(){
     }
 }
 
+function resEnd(res, htmlContent){
+    if(htmlContent){
+        res.end(htmlContent);
+    }else{
+        res.end('Page not found');
+    }
+}
 
 
 async function startServer(){
@@ -50,20 +57,19 @@ async function startServer(){
             res.writeHead(200, {'Content-Type': 'text/html'});
             if(req.url == '/'){
                 var htmlContent = getHTMLContent('index.html');
-                if(htmlContent){
-                    res.end(htmlContent);
-                }
-                else{
-                    res.end("Error loading home page");
-                }
+                resEnd(res, htmlContent);
             }
             else if(req.url == '/about'){
                 var htmlContent = getHTMLContent('about.html');
-                if(htmlContent){
-                    res.end(htmlContent);
-                }else{
-                    readSync.end("Page not found");
-                }
+                resEnd(res, htmlContent);
+            }
+            else if(req.url.includes("login")){
+                var htmlContent = getHTMLContent('login.html');
+                resEnd(res, htmlContent);
+            }
+            else if(req.url.includes('create_user')){
+                var htmlContent = getHTMLContent('create_user.html');
+                resEnd(res, htmlContent);
             }
 
         })

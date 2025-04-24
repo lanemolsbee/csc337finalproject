@@ -12,11 +12,37 @@
  * https://www.geeksforgeeks.org/how-to-include-a-javascript-file-in-another-javascript-file/
  */
 const crypto = require('crypto')
+
+/**
+ * This function returns the hashed version of a given password
+ * @param {String} password 
+ * @returns 
+ */
 function hashPassword(password){
 	return crypto.createHash('sha256').update(password).digest('hex');
 }
 
+/**
+ * This function determines whether a given user appears in the database for login purposes.
+ * It will search the database for the particular user and determine if a user with matching
+ * username, password, and role exists. 
+ * @param {Object} db is the database object to be used
+ * @param {String} username is the username of the user
+ * @param {String} password is the user's password, which must be hashed
+ * @param {String} role is the user's role. 
+ */
 async function checkLogin(db, username, password, role){
-	
+	try{
+		const hashed = hashPassword(password);
+		const user = await db.collection('users').findOne({
+			username: username,
+			password: hashed,
+			role: role
+		});
+		return user != null;
+	}catch(err){
+		console.log("Error during login check: ", err);
+		return false;
+	}
 }
-module.exports = {hashPassword};
+module.exports = {hashPassword, checkLogin};
