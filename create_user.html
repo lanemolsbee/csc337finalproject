@@ -1,1 +1,18 @@
 <!--This will be the create user page-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Create User</title>
+	</head>
+	<body>
+		<h1>Create User Form</h1>
+		<form method="POST" action="create_user_submit">
+			<label for="name">Name: </label><input type="text" id="name" name="name"><br>
+			<label for="password">Password: </label><input type="password" id="password" name="password"><br>
+			<label for="role">Account Type: </label><input type="radio" name="role" id="buyer">Buyer 
+			<input type="radio" name="role" id="seller"> Seller <input type="radio" name="role" id="admin">admin
+			<br><br>
+			<input type="submit" value="Create Account">
+		</form>
+	</body>
+</html>

@@ -87,7 +87,10 @@ async function startServer(){
                 var htmlContent = getHTMLContent('create_user.html');
                 resEnd(res, htmlContent);
             }
-
+            else if(req.url.includes('success')){
+                var htmlContent = getHTMLContent('success.html');
+                resEnd(res, htmlContent);
+            }
         })
         server.listen(8080, ()=>{
             console.log("server is listening on http://localhost:8080");
