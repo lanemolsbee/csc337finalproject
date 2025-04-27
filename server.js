@@ -83,6 +83,28 @@ async function startServer(){
                 var htmlContent = getHTMLContent('login.html');
                 resEnd(res, htmlContent);
             }
+            else if(req.url.includes('login_action')){
+                var body = ''
+                req.on('data', function(s){
+                    body += s
+                });
+                req.on('end', async function(){
+                    var query = qs.parseBody(body);
+                    var canLogin = await auth.checkLogin(db, query.name, auth.hashPassword(query.password), query.role);
+                    if(canLogin){
+                        if(query.role == 'buyer'){
+                            var htmlContent = getHTMLContent('user-purchases.html');
+                        }else if(query.role == 'seller'){
+                            var htmlContent = getHTMLContent('listings.html');
+                        }else{
+                            var htmlContent = getHTMLContent('admin_reports.html');
+                        }
+                        res.end(htmlContent);
+                    }else{
+                        res.end(getHTMLContent('login.html') + '<p>Invalid login credenetials, please try again</p>')
+                    }
+                })
+            }
             else if(req.url.includes('create_user')){
                 var htmlContent = getHTMLContent('create_user.html');
                 resEnd(res, htmlContent);
@@ -91,13 +113,52 @@ async function startServer(){
                 var htmlContent = getHTMLContent('success.html');
                 resEnd(res, htmlContent);
             }
+            else if(req.url.includes('create_user_submit')){
+                var body = ''
+                req.on('data', function(s){
+                    body += s
+                });
+                req.on('end', async function(){
+                    var query = qs.parseBody(body);
+                    await database.addUser(db, query);
+                    var htmlContent = getHTMLContent('success.html');
+                    resEnd(res, htmlContent);
+                })
+            }
+            /**
+             * ADD IN STUFF TO SERVE THE LISTINGS FORM HERE
+             */
+            else if(req.url.includes('listings')){
+                
+            }
+            /**
+             * ADD IN STUFF TO SERVE THE LOGOUT HERE
+             */
+            else if(req.url.includes('logout')){
+                var htmlContent = getHTMLContent('logout.html');
+                resEnd(res, htmlContent);
+            }
+            
+            /**
+             * ADD IN STUFF TO SERVE THE REPORT FILE HERE
+             */
+            /**
+             * ADD IN STUFF TO SERVE THE STORE FILE HERE
+             */
+            /**
+             * ADD IN STUFF TO SERVE THE UPLOAD BOOK FILE HERE
+             */
+            
+            /**
+             * ADD IN STUFF TO SERVE THE USER-PURCHASES HERE
+             */
         })
         server.listen(8080, ()=>{
             console.log("server is listening on http://localhost:8080");
         })
     }
     catch(err){
-        console.error("Failed to starat server:", err);
+        console.error("Failed to start server:", err);
     }
 }
 startServer();
