@@ -100,6 +100,15 @@ function addItemToSellerInventory(db, username, bookTitle)
 function addBookToBuyerPurchases(db, username, bookTitle){
 
 }
+/**
+ * This function adds a report to the database. 
+ * @param {Object} db - This is the database the function interacts with
+ * @param {Object} reportQuery - This is the query containing the details of the report.
+ */
+function addReport(db, reportQuery){
+
+}
+
 module.exports = {addUser, getPurchases, getInventory, removeItemFromSellerInventory, 
-	addItemToSellerInventory, addBookToBuyerPurchases
+	addItemToSellerInventory, addBookToBuyerPurchases, addReport, addBook
 };
