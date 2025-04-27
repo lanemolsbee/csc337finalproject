@@ -1,1 +1,58 @@
 <!--This will be the login page-->
+<!Doctype html>
+<html>
+<head>
+<title>login</title>
+
+</head>
+
+
+<style>
+         
+         body{
+
+            background-color: blue;
+            color: black;
+
+         }
+
+</style>
+
+
+<body>
+
+     
+
+    <h1>Welcome please login</h1>
+    <form action="/login-form" method="post">
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username"><br><br> </input>
+        
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password"><br><br> </input>
+        
+        <button type="submit">Submit</button>
+    </form>
+    
+
+    <script>
+        // Function to check if the login page exists
+        function checkLoginPage() {
+            const loginPageExists = document.querySelector('form[action="/login-form"]'); // Looks for the login form
+            if (!loginPageExists) {
+                // Display a message to suggest using the Create User link
+                alert('It seems like you don’t have a login page. Please click the "Create_user" link to create a user.');
+            }
+        }
+    
+        // Call the function when the page loads
+        window.onload = checkLoginPage;
+    </script>
+    
+    <a href="/create_user.html">create_user</a>
+    
+
+
+</body>
+</html>
+
