@@ -1,35 +1,3 @@
 <!--This will be the user purchases page-->
 
-<!DOCTYPE html>
 
-<head>
-  <title>User Purchases</title>
-</head>
-<body>
-  <h1>Your Purchases</h1>
-  <p>Below is the list of books you’ve purchased:</p>
-
-  <ul>
-    <!-- Example purchase items -->
-    <li>"Book Title 1" by Author A (Genre: Fiction) - $10.99</li>
-    <li>"Book Title 2" by Author B (Genre: Mystery) - $8.99</li>
-  </ul>
-
-  <h2>Add a Review</h2>
-  <form action="/submit-review" method="post">
-    <!-- Select Book -->
-    <label for="book">Select Book:</label>
-    <select id="book" name="book" required>
-      <option value="book1">Book Title 1</option>
-      <option value="book2">Book Title 2</option>
-    </select><br><br>
-
-    <!-- Review -->
-    <label for="review">Your Review:</label><br>
-    <textarea id="review" name="review" rows="4" cols="50" required></textarea><br><br>
-
-    <!-- Submit Button -->
-    <button type="submit">Submit Review</button>
-  </form>
-</body>
-</html>
