@@ -1,1 +1,67 @@
 <!--This will be the page that displays the reports for the admins-->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin - Submitted Reports</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Submitted Reports</h1>
+</header>
+
+<table id="reportTable">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Message</th>
+            <th>Date Submitted</th>
+        </tr>
+    </thead>
+  
+</table>
+
+<script>
+    // Static sample data for reports
+    const reports = [
+        {
+            name: "John Doe",
+            email: "john.doe@example.com",
+            message: "Book listing violates policy.",
+            date: "2025-04-26"
+        },
+        {
+            name: "Jane Smith",
+            email: "jane.smith@example.com",
+            message: "Spam content in messages.",
+            date: "2025-04-27"
+        }
+    ];
+
+    // Populate the table dynamically
+    const tableBody = document.querySelector('#reportTable tbody');
+    reports.forEach(report => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${report.name}</td>
+            <td>${report.email}</td>
+            <td>${report.message}</td>
+            <td>${report.date}</td>
+        `;
+        tableBody.appendChild(row);
+    });
+</script>
+
+</body>
+</html>
