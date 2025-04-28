@@ -4,8 +4,25 @@
 	<head>
 		<script src="source.js"></script>
 		<title>Purchase History</title>
+		<script>
+			/**
+ * This function updates the URLs for all the links on a page. 
+ */
+function updateUrls(){
+    var username = window.localStorage.getItem('username')
+    var role = window.localStorage.getItem("role")
+    if(username!=null && role!=null){
+        var alist = document.getElementsByTagName('a')
+        for(var i=0;i<alist.length;i++)
+        {
+            var par = '?username=' + username + "&role=" + role;
+            alist[i].href += par
+        }
+    }
+}
+		</script>
 	</head>
-	<body>
+	<body onload="updateUrls()">
 		<a href="#" onclick="sendReq('purchase-history')">Purchase History</a>
 		<a href="#" onclick="sendReq('store')">Store</a>
 	</body>
