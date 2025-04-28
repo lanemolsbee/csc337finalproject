@@ -152,6 +152,10 @@ async function startServer(){
              * ADD IN STUFF TO SERVE THE REPORT FILE HERE
              */
             else if(req.url.includes('submit-report')){
+                var htmlContent = getHTMLContent('report.html');
+                resEnd(res, htmlContent);
+            }
+            else if(req.url.includes('submit_report')){
 
             }
             /**
@@ -164,6 +168,9 @@ async function startServer(){
              * ADD IN STUFF TO SERVE THE UPLOAD BOOK FILE HERE
              */
             else if(req.url.includes('upload-book')){
+
+            }
+            else if(req.url.includes('submit-book')){
 
             }
             /**
