@@ -56,6 +56,7 @@ async function addBook(db, query){
  * 
  * @param {Object} db 
  * @param {String} username is the username of the user to be queried
+ * @return - the array of purchases associated with a user
  */
 function getPurchases(db, username){
 
@@ -63,8 +64,9 @@ function getPurchases(db, username){
 
 /**
  * This function will get the inventory associated with a given seller.
- * @param {Object} db 
+ * @param {Object} db - the database to be interacted with
  * @param {String} username is the username of the seller to be queried
+ * @return - an array of the books in the inventory
  */
 function getInventory(db, username){
 

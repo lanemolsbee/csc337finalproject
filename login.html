@@ -17,27 +17,40 @@
     }
 
 </style>
-<style>
-         
-    body{
-
-       background-color: blue;
-       color: black;
-
+<script src="source.js"></script>
+<script>
+    function saveUser(){
+        var username = document.getElementById('username');
+        var role;
+        var password = document.getElementById('password').value;
+        if(document.getElementById("buyer").checked){
+                role = "buyer";
+        }                     
+        else if(document.getElementById("seller").checked){
+            role = "seller";
+        }  
+        else if(document.getElementById("admin").checked){
+            role = "admin";
+        }              
+        if(username.value && role && password){
+            window.localStorage.setItem("username", username.value);
+            window.localStorage.setItem("role", role);
+            if(role == 'buyer'){
+                window.location.href = "/purchase-history"
+            }
+            if(role == 'seller'){
+                window.location.href = "/inventory";
+            }
+            if(role == 'admin'){
+                window.location.href = "/reports"
+            }
+        }else{
+            alert("Please enter username and select a role");
+            event.preventDefault();
+        }
     }
-    a{
-       text-decoration: underline;
-       color: blue;
-    }
-
-</style>
-
+</script>
 </head>
-
-
-
-
-
 <body>
 
      
@@ -46,13 +59,15 @@
     <a href="#" onclick="sendReq('/')">Home</a>
     <a href="#" onclick="sendReq('about')">About</a>
     
-    <form action="/login-form" method="post">
+    <form action="/login-form" method="post" onsubmit="saveUser(); return true">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username"><br><br> </input>
         
         <label for="password">Password:</label>
         <input type="password" id="password" name="password"><br><br> </input>
-        
+        <label for="role">Role: </label>
+        <input type="radio" name="buyer" id="buyer">Buyer <input type="radio" name="seller" id="seller"> Seller
+        <input type="radio" name="admin" id="admin"> Admin
         <button type="submit">Submit</button>
     </form>
     Don't have an account? Click here!
