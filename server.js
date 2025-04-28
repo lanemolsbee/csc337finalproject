@@ -45,6 +45,16 @@ function resEnd(res, htmlContent){
     }
 }
 
+async function getStoreInventory(){
+    try{
+        var coll = db.collection("listings");
+        var docs = await coll.find({}).toArray()
+        return docs;
+    }catch(err){
+        console.log(err);
+    }
+}
+
 /**
  * This function acts as a wrapper for starting the server and connecting
  * the server to the MongoDB database
@@ -127,11 +137,62 @@ async function startServer(){
             }
             //Serve listings.html, AKA a seller's inventory
             else if(req.url.includes('listings')){
-                res.writeHead(200, {'Content-Type': 'text/html'});
+                
             }
             //Serve store.html, which is the contents of the store as it exists now
             else if(req.url.includes("store")){
                 res.writeHead(200, {'Content-Type': 'text/html'});
+                var storeContents = getStoreInventory();
+                res.end(`<!--This will be the store page-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Store</title>
+		<script src="source.js"></script>
+		<script>
+			/**
+ * This function updates the URLs for all the links on a page. 
+ */
+function updateUrls(){
+    var username = window.localStorage.getItem('username')
+    var role = window.localStorage.getItem("role")
+    if(username!=null && role!=null){
+        var alist = document.getElementsByTagName('a')
+        for(var i=0;i<alist.length;i++)
+        {
+            var par = '?username=' + username + "&role=" + role;
+            alist[i].href += par
+        }
+    }
+}
+		</script>
+	</head>
+	<body onload="updateUrls()">
+		<a href="#" onclick="sendReq('purchase-history')">Purchase History</a>
+		<a href="#" onclick="sendReq('store')">Store</a>
+		<table id="storeListings">
+			<tr>
+				<td>Title</th>
+				<td>Price</th>
+			</tr>
+		</table>
+		<script>
+			var items = ${storeContents}
+			var table = document.getElementById('storeListings');
+			for(var i = 0; i < items.length; i++){
+				var tr = document.createElement('tr');
+				var td1 = document.createElement('td');
+				var rd2 = document.createElement('td');
+				td1.innerHTML = items[i].title;
+				td2.innerHTML = items[i].price;
+				tr.appendChild(td1);
+				tr.appendChild(td2);
+				table.appendChild(tr);
+			}
+		</script>
+	</body>
+</html>`);
+
             }
             //Serve logout.html
             else if(req.url.includes('logout')){

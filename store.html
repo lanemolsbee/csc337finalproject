@@ -25,5 +25,25 @@ function updateUrls(){
 	<body onload="updateUrls()">
 		<a href="#" onclick="sendReq('purchase-history')">Purchase History</a>
 		<a href="#" onclick="sendReq('store')">Store</a>
+		<table id="storeListings">
+			<tr>
+				<td>Title</th>
+				<td>Price</th>
+			</tr>
+		</table>
+		<script>
+			var items = ${storeContents}
+			var table = document.getElementById('storeListings');
+			for(var i = 0; i < items.length; i++){
+				var tr = document.createElement('tr');
+				var td1 = document.createElement('td');
+				var rd2 = document.createElement('td');
+				td1.innerHTML = items[i].title;
+				td2.innerHTML = items[i].price;
+				tr.appendChild(td1);
+				tr.appendChild(td2);
+				table.appendChild(tr);
+			}
+		</script>
 	</body>
 </html>
