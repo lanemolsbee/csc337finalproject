@@ -32,21 +32,6 @@ function getHTMLContent(fileName){
     }
 }
 /**
- * This function updates the URLs for all the links on a page. 
- */
-function updateUrls(){
-    var username = window.localStorage.getItem('username')
-    var role = window.localStorage.getItem("role")
-    if(username!=null && role!=null){
-        var alist = document.getElementsByTagName('a')
-        for(var i=0;i<alist.length;i++)
-        {
-            var par = '?username=' + username + "&role=" + role;
-            alist[i].href += par
-        }
-    }
-}
-/**
  * This function consolidates the task of sending responses so the code in it is not
  * repeated throughout the server. 
  * @param {http.ServerResponse} res - the response object
@@ -178,6 +163,7 @@ async function startServer(){
                 req.on('end', async function(){
                     var query = qs.parseBody(body);
                     await database.addBook(db, query);
+                    await database.addItemToSellerInventory(db, query.username, query.title, query.price);
                     var htmlContent = getHTMLContent('success.html');
                     resEnd(res, htmlContent);
                 })

@@ -22,6 +22,8 @@ var auth = require('./auth')
  */
 async function addUser(db, query){
 	try{
+		//Get the Collection title based on the role (for functions that invole adding books or removing them
+		//you will want to use different collections)
 		var collectionTitle;
 		if(query.role == 'buyer'){
 			collectionTitle = 'buyers';
@@ -30,13 +32,33 @@ async function addUser(db, query){
 		} else{
 			collectionTitle = 'admins';
 		}
+		//Get teh collection associated with the title of the collection worked with
 		const userCollection = db.collection(collectionTitle);
-		const user = {
-			"username": query.name,
-			"password": auth.hashPassword(query.password),
-			"purchases": []
+		//Define the item to be added using the items in the query
+		var user;
+		if(collectionTitle == 'buyers'){
+			user = {
+				"username": query.name,
+				"password": auth.hashPassword(query.password),
+				"purchases": []
+			}	
 		}
+		if(collectionTitle == 'sellers'){
+			user = {
+				"username": query.name,
+				"password": auth.hashPassword(query.password),
+				"inventory": []
+			}
+		}
+		else{
+			user = {
+				"username": query.username,
+				"password": auth.hashPassword(query.password)
+			}
+		}
+		//Add to the database
 		await userCollection.insertOne(user);
+		//Log to the console if successful
 		console.log('User inserted successfully');
 	}catch(err){
 		console.error('Error inserting user: ', err);
@@ -48,7 +70,12 @@ async function addUser(db, query){
  * @param {Object} query - the object containing the book's information to add to the database.
  */
 async function addBook(db, query){
-
+	/**
+	 * For this function, the collection you will want to work with should be listings. 
+	 * You will just add a book that you fill out using the query parameters to add to the list.
+	 * Keep in mind, this happens when a seller uploads to the store. Do not use the username section
+	 * of the query parameters for this, only give the book title and price.
+	 */
 }
 
 /**
@@ -59,7 +86,11 @@ async function addBook(db, query){
  * @return - the array of purchases associated with a user
  */
 function getPurchases(db, username){
-
+	/**
+	 * 
+	 * For this function, you will work with the buyers collection.
+	 * You want to retrieve the purchases array associated with teh username
+	 */
 }
 
 /**
@@ -69,7 +100,10 @@ function getPurchases(db, username){
  * @return - an array of the books in the inventory
  */
 function getInventory(db, username){
-
+	/**
+	 * Similar to getPUrchases, but you use the sellers collection
+	 * 'and return the inventory array associated with the username
+	 */
 }
 
 /**
@@ -78,8 +112,12 @@ function getInventory(db, username){
  * @param {String} username is the username of the seller to be queried
  * @param {String} bookTitle is thetitle of the book to be removed
  */
-function removeItemFromSellerInventory(db, username, bookTitle){
-
+function removeItemFromSellerInventory(db, username, bookTitle, price){
+	/**
+	 * You will work with the sellers collection again, 
+	 * but this time you will remove an item from the inventory array
+	 * associated with the username in the database
+	 */
 }
 
 /**
@@ -88,9 +126,22 @@ function removeItemFromSellerInventory(db, username, bookTitle){
  * @param {String} username is the username of the seller to be queried
  * @param {String} bookTitle is the title of the book to be added
  */
-function addItemToSellerInventory(db, username, bookTitle)
+function addItemToSellerInventory(db, username, bookTitle, price)
 {
-
+	/**
+	 * Does the opposite of removeItemFromSellerInventory: this one adds
+	 * to the array. 
+	 */
+}
+/**
+ * This function will remove an item from the store. 
+ * @param {Object} db - the database this function interacts with
+ * @param {String} bookTitle - the title of the book to be removed from teh store. 
+ */
+function removeItemFromStore(db, bookTitle){
+	/**
+	 * This works with teh collection "listings" and removes the boook with the given title. 
+	 */
 }
 
 /**
@@ -100,7 +151,10 @@ function addItemToSellerInventory(db, username, bookTitle)
  * @param {String} bookTitle is the title of the book to be added
  */
 function addBookToBuyerPurchases(db, username, bookTitle){
-
+	/**
+	 * Thsi function works with the buyers collection and adds a book 
+	 * to the buyer associated with username's purchase list
+	 */
 }
 /**
  * This function adds a report to the database. 
@@ -108,9 +162,13 @@ function addBookToBuyerPurchases(db, username, bookTitle){
  * @param {Object} reportQuery - This is the query containing the details of the report.
  */
 function addReport(db, reportQuery){
-
+	/**
+	 * This function works with a collection called "reports".
+	 * It adds a report to this and fills out an object using the query parameters
+	 * similar to adduser
+	 */
 }
 
 module.exports = {addUser, getPurchases, getInventory, removeItemFromSellerInventory, 
-	addItemToSellerInventory, addBookToBuyerPurchases, addReport, addBook
+	addItemToSellerInventory, addBookToBuyerPurchases, addReport, addBook, removeItemFromStore
 };
