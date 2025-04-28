@@ -71,19 +71,26 @@ async function startServer(){
         db = client.db('userDB');
         const server = http.createServer(function(req, res){
             res.writeHead(200, {'Content-Type': 'text/html'});
+            //Serve index.html
             if(req.url == '/'){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('index.html');
                 resEnd(res, htmlContent);
             }
+            //Serve about.html
             else if(req.url == '/about'){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('about.html');
                 resEnd(res, htmlContent);
             }
+            //Serve login.html and the action associated with the login form
             else if(req.url.includes("login")){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('login.html');
                 resEnd(res, htmlContent);
             }
             else if(req.url.includes('login-form')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var body = ''
                 req.on('data', function(s){
                     body += s
@@ -108,15 +115,14 @@ async function startServer(){
                     }
                 })
             }
+            //Serve the form to create the user. 
             else if(req.url.includes('create_user')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('create_user.html');
                 resEnd(res, htmlContent);
             }
-            else if(req.url.includes('success')){
-                var htmlContent = getHTMLContent('success.html');
-                resEnd(res, htmlContent);
-            }
             else if(req.url.includes('create_user_submit')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var body = ''
                 req.on('data', function(s){
                     body += s
@@ -128,72 +134,76 @@ async function startServer(){
                     resEnd(res, htmlContent);
                 })
             }
-            /**
-             * ADD IN STUFF TO SERVE THE LISTINGS FORM HERE
-             */
+            //Serve success.html
+            else if(req.url.includes('success')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                var htmlContent = getHTMLContent('success.html');
+                resEnd(res, htmlContent);
+            }
+            //Serve listings.html, AKA a seller's inventory
             else if(req.url.includes('listings')){
-                
+                res.writeHead(200, {'Content-Type': 'text/html'});
             }
-            /**
-             * ADD STUFF TO SERVE THE STORE.HTML FILE HERE
-             */
+            //Serve store.html, which is the contents of the store as it exists now
             else if(req.url.includes("store")){
-
+                res.writeHead(200, {'Content-Type': 'text/html'});
             }
-            /**
-             * ADD IN STUFF TO SERVE THE LOGOUT HERE
-             */
+            //Serve logout.html
             else if(req.url.includes('logout')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('logout.html');
                 resEnd(res, htmlContent);
             }
-            
-            /**
-             * ADD IN STUFF TO SERVE THE REPORT FILE HERE
-             */
+            //Serve report.html and the associated form action
             else if(req.url.includes('submit-report')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('report.html');
                 resEnd(res, htmlContent);
             }
             else if(req.url.includes('submit_report')){
-
+                res.writeHead(200, {'Content-Type': 'text/html'});
             }
-            /**
-             * ADD IN STUFF TO SERVE THE STORE FILE HERE
-             */
-            else if(req.url.includes("reports")){
-
-            }
-            /**
-             * ADD IN STUFF TO SERVE THE UPLOAD BOOK FILE HERE
-             */
+            //Serve upload-book.html and its associated form action
             else if(req.url.includes('upload-book')){
-
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                var htmlContent = getHTMLContent('upload-book.html');
+                resEnd(res, htmlContent);
             }
             else if(req.url.includes('submit-book')){
-
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                var body = ''
+                req.on('data', function(s){
+                    body += s
+                });
+                req.on('end', async function(){
+                    var query = qs.parseBody(body);
+                    await database.addBook(db, query);
+                    var htmlContent = getHTMLContent('success.html');
+                    resEnd(res, htmlContent);
+                })
             }
-            /**
-             * ADD IN STUFF TO SERVE THE USER-PURCHASES HERE
-             */
+            //Serve user-purchases.html, the user's purchase history
             else if(req.url.includes('purchase-history')){
-
+                res.writeHead(200, {'Content-Type': 'text/html'});
             }
-            /**
-             * ADD IN STUFF TO SERVE THE REPORTS FOR ADMINS TO READ
-             */
+            //Serve admin_reports.html, the list of reports for Admins to view
             else if(req.url.includes('view-reports')){
-
+                res.writeHead(200, {'Content-Type': 'text/html'});
             }
+            //Serve source.js for linking between pages
             else if(req.url.includes('source.js')){
+                res.writeHead(200, {'Content-Type': 'application/javascript'});
                 try{
                     var content = fs.readFileSync('source.js', {'encoding':'utf8'})
                     res.end(content)
                 }catch(err){
                     console.log(err)
                 }
+            //No other page is valid, so serve "Page not found"
             }else{
-                res.end('Page not found');
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                var htmlContent = getHTMLContent('invalid-page.html');
+                resEnd(res, htmlContent);
             }
         })
         server.listen(8080, ()=>{
