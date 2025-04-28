@@ -18,8 +18,8 @@ var auth = require('./auth')
  * has in the store. 
  * @param {Object} db 
  * @param {Object} query - The query containing the data to be added
- * 
  */
+
 async function addUser(db, query){
 	try{
 		//Get the Collection title based on the role (for functions that invole adding books or removing them
@@ -76,7 +76,32 @@ async function addBook(db, query){
 	 * Keep in mind, this happens when a seller uploads to the store. Do not use the username section
 	 * of the query parameters for this, only give the book title and price.
 	 */
-}
+       const { title, price } = query;
+	
+		// Validate that both title and price are provided
+		if (!title || !price) {
+			throw new Error("Both title and price are required to add a book.");
+		}
+	
+		// Create the book object to be inserted into the database
+		const book = {
+			title: title,
+			price: price,
+			dateAdded: new Date() // Optional: Track when the book was added
+		};
+	
+		try {
+			// Add the book to the 'listings' collection in the database
+			const result = await db.collection("listings").insertOne(book);
+			console.log("Book successfully added:", result.insertedId);
+			return result;
+		} catch (error) {
+			console.error("Error adding book:", error);
+			throw new Error("Failed to add the book to the database.");
+		}
+	}
+	
+
 
 /**
  * This function will get the purchases associated with a given buyer.
@@ -91,7 +116,30 @@ function getPurchases(db, username){
 	 * For this function, you will work with the buyers collection.
 	 * You want to retrieve the purchases array associated with teh username
 	 */
-}
+
+		if (!username) {
+			throw new Error("Username is required to retrieve purchases.");
+		}
+	
+		// Return a promise for the retrieval of purchases
+		return db.collection("buyers").findOne({ username: username })
+			.then(user => {
+				// If the user is not found, throw an error
+				if (!user) {
+					throw new Error(`No buyer found with username: ${username}`);
+				}
+	
+				// Return the purchases array associated with the user
+				return user.purchases || [];
+			})
+			.catch(error => {
+				console.error("Error retrieving purchases:", error);
+				throw new Error("Failed to retrieve purchases for the user.");
+			});
+	}
+	
+	
+
 
 /**
  * This function will get the inventory associated with a given seller.
@@ -104,7 +152,29 @@ function getInventory(db, username){
 	 * Similar to getPUrchases, but you use the sellers collection
 	 * 'and return the inventory array associated with the username
 	 */
-}
+	
+		if (!username) {
+			throw new Error("Username is required to retrieve inventory.");
+		}
+	
+		// Return a promise for the inventory retrieval
+		return db.collection("sellers").findOne({ username: username })
+			.then(seller => {
+				// If the seller is not found, throw an error
+				if (!seller) {
+					throw new Error(`No seller found with username: ${username}`);
+				}
+	
+				// Return the inventory array associated with the seller
+				return seller.inventory || [];
+			})
+			.catch(error => {
+				console.error("Error retrieving inventory:", error);
+				throw new Error("Failed to retrieve inventory for the seller.");
+			});
+	}
+	
+	
 
 /**
  * This function will remove an item from a given sellerss inventory
@@ -118,7 +188,31 @@ function removeItemFromSellerInventory(db, username, bookTitle, price){
 	 * but this time you will remove an item from the inventory array
 	 * associated with the username in the database
 	 */
-}
+		if (!username || !bookTitle) {
+			throw new Error("Username and bookTitle are required to remove an item from the inventory.");
+		}
+	
+		// Construct the item to be removed
+		const itemToRemove = { title: bookTitle, price: price };
+	
+		// Return a promise for the inventory update
+		return db.collection("sellers").updateOne(
+			{ username: username }, // Find the seller by username
+			{ $pull: { inventory: itemToRemove } } // Remove the matching item from the inventory array
+		)
+		.then(result => {
+			if (result.modifiedCount === 0) {
+				throw new Error(`No matching item found in the inventory for username: ${username}`);
+			}
+			console.log("Item successfully removed from inventory.");
+			return result;
+		})
+		.catch(error => {
+			console.error("Error removing item from inventory:", error);
+			throw new Error("Failed to remove the item from the seller's inventory.");
+		});
+	}
+	
 
 /**
  * This function will add an item to a given sellerss inventory.
@@ -126,13 +220,13 @@ function removeItemFromSellerInventory(db, username, bookTitle, price){
  * @param {String} username is the username of the seller to be queried
  * @param {String} bookTitle is the title of the book to be added
  */
-function addItemToSellerInventory(db, username, bookTitle, price)
-{
-	/**
-	 * Does the opposite of removeItemFromSellerInventory: this one adds
-	 * to the array. 
-	 */
+function addItemToSellerInventory(db, username, bookTitle, price){
+
+	
 }
+
+
+
 /**
  * This function will remove an item from the store. 
  * @param {Object} db - the database this function interacts with
