@@ -16,11 +16,18 @@
 				text-align: center;
 				background-color: green;
 			}
+			a{
+				text-decoration: underline;
+				color: blue;
+			}
 			
 		</style>
 	</head>
 	<body>
 		<h1>Store Listings</h1>
+		<a href="#" onclick="sendReq('upload-book')">Upload a book</a>
+		<a href="#" onclick="sendReq('listings')">Listings</a>
+		<a href="#" onclick="sendReq('logout')">Logout</a>
 		<table id="storeListings">
 			<tr>
 				<td>Title</th>

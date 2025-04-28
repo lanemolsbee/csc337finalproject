@@ -83,7 +83,7 @@ async function startServer(){
                 var htmlContent = getHTMLContent('login.html');
                 resEnd(res, htmlContent);
             }
-            else if(req.url.includes('login_action')){
+            else if(req.url.includes('login-form')){
                 var body = ''
                 req.on('data', function(s){
                     body += s
@@ -94,10 +94,13 @@ async function startServer(){
                     if(canLogin){
                         if(query.role == 'buyer'){
                             var htmlContent = getHTMLContent('user-purchases.html');
+                            res.url = '/purchase-history';
                         }else if(query.role == 'seller'){
                             var htmlContent = getHTMLContent('listings.html');
+                            res.url = "/inventory";
                         }else{
                             var htmlContent = getHTMLContent('admin_reports.html');
+                            res.url = '/reports';
                         }
                         res.end(htmlContent);
                     }else{
@@ -132,6 +135,12 @@ async function startServer(){
                 
             }
             /**
+             * ADD STUFF TO SERVE THE STORE.HTML FILE HERE
+             */
+            else if(req.url.includes("store")){
+
+            }
+            /**
              * ADD IN STUFF TO SERVE THE LOGOUT HERE
              */
             else if(req.url.includes('logout')){
@@ -142,16 +151,43 @@ async function startServer(){
             /**
              * ADD IN STUFF TO SERVE THE REPORT FILE HERE
              */
+            else if(req.url.includes('submit-report')){
+
+            }
             /**
              * ADD IN STUFF TO SERVE THE STORE FILE HERE
              */
+            else if(req.url.includes("reports")){
+
+            }
             /**
              * ADD IN STUFF TO SERVE THE UPLOAD BOOK FILE HERE
              */
-            
+            else if(req.url.includes('upload-book')){
+
+            }
             /**
              * ADD IN STUFF TO SERVE THE USER-PURCHASES HERE
              */
+            else if(req.url.includes('purchase-history')){
+
+            }
+            /**
+             * ADD IN STUFF TO SERVE THE REPORTS FOR ADMINS TO READ
+             */
+            else if(req.url.includes('view-reports')){
+
+            }
+            else if(req.url.includes('source.js')){
+                try{
+                    var content = fs.readFileSync('source.js', {'encoding':'utf8'})
+                    res.end(content)
+                }catch(err){
+                    console.log(err)
+                }
+            }else{
+                res.end('Page not found');
+            }
         })
         server.listen(8080, ()=>{
             console.log("server is listening on http://localhost:8080");
