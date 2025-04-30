@@ -137,7 +137,32 @@ async function getReports(db){
  * @param {String} bookTitle is the title of the book to be added
  */
 function addItemToSellerInventory(db, username, bookTitle, price){
-	
+	// Check if the seller exists in the database
+    if (!db[username]) {
+        console.error(`Seller with username ${username} not found.`);
+        return false; // Operation unsuccessful
+    }
+    
+    // Check if the book title already exists in the seller's inventory
+    const inventory = db[username].inventory || [];
+    const existingBook = inventory.find(item => item.bookTitle === bookTitle);
+    if (existingBook) {
+        console.error(`The book "${bookTitle}" already exists in the inventory.`);
+        return false; // Operation unsuccessful
+    }
+
+    // Add the new book to the seller's inventory
+    const newBook = {
+        bookTitle: bookTitle,
+        price: price
+    };
+    inventory.push(newBook);
+
+    // Update the seller's inventory in the database
+    db[username].inventory = inventory;
+
+    console.log(`The book "${bookTitle}" has been added to ${username}'s inventory.`);
+    return true; // Operation successful
 	
 }
 
@@ -149,12 +174,28 @@ function addItemToSellerInventory(db, username, bookTitle, price){
  * @param {Object} db - This is the database the function interacts with
  * @param {Object} reportQuery - This is the query containing the details of the report.
  */
-function addReport(db, reportQuery){
+async  function addReport(db, reportQuery){
 	/**
 	 * This function works with a collection called "reports".
 	 * It adds a report to this and fills out an object using the query parameters
 	 * similar to adduser
 	 */
+
+	try {
+        const reportsCollection = db.collection("reports");
+        const report = {
+            title: reportQuery.title,
+            description: reportQuery.description,
+            reporter: reportQuery.reporter,
+            date: new Date(),
+        };
+        const result = await reportsCollection.insertOne(report);
+        console.log("Report added with ID:", result.insertedId);
+        return result;
+    } catch (error) {
+        console.error("Error adding report:", error);
+        throw error;
+    }
 }
 
 module.exports = {addUser, addItemToSellerInventory, addReport, addBook, getReports
