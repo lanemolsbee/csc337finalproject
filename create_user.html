@@ -1,18 +1,90 @@
-<!--This will be the create user page-->
+<!--This will be the create user page
+
+-->
 <!DOCTYPE html>
 <html>
-	<head>
-		<title>Create User</title>
-	</head>
-	<body>
-		<h1>Create User Form</h1>
-		<form method="POST" action="create_user_submit">
-			<label for="name">Name: </label><input type="text" id="name" name="name"><br>
-			<label for="password">Password: </label><input type="password" id="password" name="password"><br>
-			<label for="role">Account Type: </label><input type="radio" name="role" id="buyer">Buyer 
-			<input type="radio" name="role" id="seller"> Seller <input type="radio" name="role" id="admin">admin
-			<br><br>
-			<input type="submit" value="Create Account">
-		</form>
-	</body>
+    <head>
+        <title>Create an Account</title>
+        <style>
+            #report-banner{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    background-color: lightgreen;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5px0;
+    z-index: 1000;
+    text-align: center;
+}
+#report-banner h1{
+    margin: 0;
+    font-size: 30px;
+}
+#nav-links{
+    margin-top: 5px;
+    font-size: 15px;
+}
+#nav-links a{
+    color: blue;
+    text-decoration: underline;
+    margin: 0 10px;
+}
+body{
+    background-color: lightgray;
+    margin: 0;
+}
+#main-content{
+    margin-top: 12vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 20px;
+}
+.form-container{
+    background-color: lightgray;
+    padding: 20px;
+    border: 2px black solid;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+}
+        </style>
+        <script src="source.js"></script>
+    </head>
+    <body style="background-color: lightgray;">
+        <div id="report-banner">
+            <h1>Report a Problem</h1>
+            <div id="nav-links">
+                <a href="#" onclick="sendReq('/')">Home</a>
+                <a href="#" onclick="sendReq('about')">About</a>
+                <a href="#" onclick="sendReq('login')">Login</a>
+                <a href="#" onclick="sendReq('submit-report')">Submit Report</a>
+            </div>
+          
+        </div>
+        <div id="main-content">
+            <div class="form-container">
+                <form action="create_user_submit" method="POST">
+                    <label for="name">Name: </label><input type="text" id="name" name="name"><br>
+					<label for="password">Password: </label><input type="password" id="password" name="password"><br>
+					<label for="role">Account Type: </label><input type="radio" name="role" id="buyer" value="buyer">Buyer 
+					<input type="radio" name="role" id="seller" value="seller"> Seller
+					<input type="radio" name="role" id="admin" value="admin">admin
+					<br><br>
+					<input type="submit" value="Create Account">
+
+                </form>
+            </div>        
+        </div>
+    </body>
 </html>

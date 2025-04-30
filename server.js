@@ -65,15 +65,15 @@ async function startServer(){
         console.log("Connected to MongoDB");
         db = client.db('userDB');
         const server = http.createServer(async function(req, res){
-            res.writeHead(200, {'Content-Type': 'text/html'});
             //Serve index.html
+            console.log(req.url);
             if(req.url == '/'){
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('index.html');
                 resEnd(res, htmlContent);
             }
             //Serve about.html
-            else if(req.url == '/about'){
+            else if(req.url.includes('about')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('about.html');
                 resEnd(res, htmlContent);
@@ -91,18 +91,18 @@ async function startServer(){
                     body += s
                 });
                 req.on('end', async function(){
-                    var query = qs.parseBody(body);
+                    var query = qs.parse(body);
                     var canLogin = await auth.checkLogin(db, query.name, auth.hashPassword(query.password), query.role);
                     if(canLogin){
                         if(query.role == 'buyer'){
                             var htmlContent = getHTMLContent('user-purchases.html');
-                            res.url = '/purchase-history';
+                            req.url = '/purchase-history';
                         }else if(query.role == 'seller'){
                             var htmlContent = getHTMLContent('listings.html');
-                            res.url = "/inventory";
+                            req.url = "/inventory";
                         }else{
                             var htmlContent = getHTMLContent('admin_reports.html');
-                            res.url = '/reports';
+                            req.url = '/reports';
                         }
                         res.end(htmlContent);
                     }else{
@@ -110,7 +110,7 @@ async function startServer(){
                     }
                 })
             }
-            //Serve the form to create the user. 
+            //Serve report.html and the associated form action
             else if(req.url.includes('create_user')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('create_user.html');
@@ -118,17 +118,26 @@ async function startServer(){
             }
             else if(req.url.includes('create_user_submit')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
-                var body = ''
-                req.on('data', function(s){
-                    body += s
+                let body = '';
+                req.on('data', chunk => {
+                    console.log('Chunk received: ', chunk);
+                    body += chunk
                 });
-                req.on('end', async function(){
-                    var query = qs.parseBody(body);
-                    await database.addUser(db, query);
-                    var htmlContent = getHTMLContent('success.html');
-                    resEnd(res, htmlContent);
-                })
+                req.on('end', async () => {
+                    try{
+                        const parsed = qs.parse(body);
+                        console.log('Parsed data:', parsed);
+                        await database.addUser(db, parsed);
+                        var htmlContent = getHTMLContent('success.html');
+                        resEnd(res, htmlContent);
+                    }catch(err){
+                        console.error('Error submitting report: ', err);
+                        res.end('<h1>Failed to submit report.</h1>');
+                    }
+                    
+                });
             }
+            
             //Serve success.html
             else if(req.url.includes('success')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
@@ -203,8 +212,26 @@ function updateUrls(){
                 var htmlContent = getHTMLContent('report.html');
                 resEnd(res, htmlContent);
             }
-            else if(req.url.includes('submit_report')){
+            else if(req.url.includes('submit_report_form')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
+                let body = '';
+                req.on('data', chunk => {
+                    console.log('Chunk received: ', chunk);
+                    body += chunk
+                });
+                req.on('end', async () => {
+                    try{
+                        const parsed = qs.parse(body);
+                        console.log('Parsed data:', parsed);
+                        await database.addReport(db, parsed);
+                        var htmlContent = getHTMLContent('success.html');
+                        resEnd(res, htmlContent);
+                    }catch(err){
+                        console.error('Error submitting report: ', err);
+                        res.end('<h1>Failed to submit report.</h1>');
+                    }
+                    
+                });
             }
             //Serve upload-book.html and its associated form action
             else if(req.url.includes('upload-book')){
@@ -219,7 +246,7 @@ function updateUrls(){
                     body += s
                 });
                 req.on('end', async function(){
-                    var query = qs.parseBody(body);
+                    var query = qs.parse(body);
                     await database.addBook(db, query);
                     await database.addItemToSellerInventory(db, query.username, query.title, query.price);
                     var htmlContent = getHTMLContent('success.html');

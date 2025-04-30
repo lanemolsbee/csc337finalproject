@@ -7,7 +7,7 @@
          
     body{
 
-       background-color: blue;
+       background-color: gray;
        color: black;
 
     }
@@ -19,36 +19,36 @@
 </style>
 <script src="source.js"></script>
 <script>
-    function saveUser(){
-        var username = document.getElementById('username');
-        var role;
-        var password = document.getElementById('password').value;
-        if(document.getElementById("buyer").checked){
-                role = "buyer";
-        }                     
-        else if(document.getElementById("seller").checked){
-            role = "seller";
-        }  
-        else if(document.getElementById("admin").checked){
-            role = "admin";
-        }              
-        if(username.value && role && password){
-            window.localStorage.setItem("username", username.value);
-            window.localStorage.setItem("role", role);
-            if(role == 'buyer'){
-                window.location.href = "/purchase-history"
-            }
-            if(role == 'seller'){
-                window.location.href = "/inventory";
-            }
-            if(role == 'admin'){
-                window.location.href = "/reports"
-            }
-        }else{
-            alert("Please enter username and select a role");
-            event.preventDefault();
+    
+async function saveUser(event){
+    event.preventDefault(); // Stop form submission
+
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    const role = document.querySelector('input[name="role"]:checked')?.value;
+
+    if (username && password && role) {
+        const response = await fetch('/create-user', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ name: username, password: password, role: role })
+        });
+
+        if (response.ok) {
+            localStorage.setItem("username", username);
+            localStorage.setItem("role", role);
+            if(role === 'buyer') location.href = "/purchase-history";
+            else if(role === 'seller') location.href = "/inventory";
+            else location.href = "/reports";
+        } else {
+            const msg = await response.text();
+            alert("Server error: " + msg);
         }
+    } else {
+        alert("Please fill out all fields");
     }
+}
+
 </script>
 </head>
 <body>
@@ -64,14 +64,14 @@
         <input type="text" id="username" name="username"><br><br> </input>
         
         <label for="password">Password:</label>
-        <input type="password" id="password" name="password"><br><br> </input>
+        <input type="password" id="password" name="role"><br><br> </input>
         <label for="role">Role: </label>
-        <input type="radio" name="buyer" id="buyer">Buyer <input type="radio" name="seller" id="seller"> Seller
-        <input type="radio" name="admin" id="admin"> Admin
+        <input type="radio" name="role" id="buyer">Buyer <input type="radio" name="seller" id="seller"> Seller
+        <input type="radio" name="role" id="admin"> Admin
         <button type="submit">Submit</button>
     </form>
     Don't have an account? Click here!
-    <a href="#" onclick="sendReq('create_user')">Create User</a>
+    <a href="/create_user">Create User</a>
     
     
 

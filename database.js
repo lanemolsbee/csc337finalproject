@@ -21,6 +21,7 @@ var auth = require('./auth')
  */
 
 async function addUser(db, query){
+	console.log("Entered");
 	try{
 		//Get the Collection title based on the role (for functions that invole adding books or removing them
 		//you will want to use different collections)
@@ -43,7 +44,7 @@ async function addUser(db, query){
 				"purchases": []
 			}	
 		}
-		if(collectionTitle == 'sellers'){
+		else if(collectionTitle == 'sellers'){
 			user = {
 				"username": query.name,
 				"password": auth.hashPassword(query.password),
@@ -52,7 +53,7 @@ async function addUser(db, query){
 		}
 		else{
 			user = {
-				"username": query.username,
+				"username": query.name,
 				"password": auth.hashPassword(query.password)
 			}
 		}
@@ -70,6 +71,7 @@ async function addUser(db, query){
  * @param {Object} query - the object containing the book's information to add to the database.
  */
 async function addBook(db, query){
+	
 	/**
 	 * For this function, the collection you will want to work with should be listings. 
 	 * You will just add a book that you fill out using the query parameters to add to the list.
@@ -136,34 +138,25 @@ async function getReports(db){
  * @param {String} username is the username of the seller to be queried
  * @param {String} bookTitle is the title of the book to be added
  */
-function addItemToSellerInventory(db, username, bookTitle, price){
-	// Check if the seller exists in the database
-    if (!db[username]) {
-        console.error(`Seller with username ${username} not found.`);
-        return false; // Operation unsuccessful
-    }
-    
-    // Check if the book title already exists in the seller's inventory
-    const inventory = db[username].inventory || [];
-    const existingBook = inventory.find(item => item.bookTitle === bookTitle);
-    if (existingBook) {
-        console.error(`The book "${bookTitle}" already exists in the inventory.`);
-        return false; // Operation unsuccessful
-    }
-
-    // Add the new book to the seller's inventory
-    const newBook = {
-        bookTitle: bookTitle,
-        price: price
-    };
-    inventory.push(newBook);
-
-    // Update the seller's inventory in the database
-    db[username].inventory = inventory;
-
-    console.log(`The book "${bookTitle}" has been added to ${username}'s inventory.`);
-    return true; // Operation successful
-	
+async function addItemToSellerInventory(db, username, bookTitle, price){
+	var sellers = db.collection('sellers');
+	const seller = await sellers.findOne({username: username});
+	if(!seller){
+		console.error(`Seller with username ${username} not found`);
+		return false;
+	}
+	const newBook = {bookTitle: bookTitle, price: price};
+	const result = await sellers.updateOne(
+		{ username: username},
+		{ $push: {inventory: newBook}}
+	);
+	if(result.modifiedCound == 1){
+		console.log(`The book ${bookTitle} has been added to ${username}s' inventory`);
+		return true;
+	}else{
+		console.error(`Failed to update inventory for ${username}`);
+		return false;
+	}
 }
 
 
@@ -184,10 +177,9 @@ async  function addReport(db, reportQuery){
 	try {
         const reportsCollection = db.collection("reports");
         const report = {
-            title: reportQuery.title,
-            description: reportQuery.description,
-            reporter: reportQuery.reporter,
-            date: new Date(),
+            "name": reportQuery.name,
+			"email": reportQuery.email,
+			"message": reportQuery.message
         };
         const result = await reportsCollection.insertOne(report);
         console.log("Report added with ID:", result.insertedId);
@@ -198,5 +190,5 @@ async  function addReport(db, reportQuery){
     }
 }
 
-module.exports = {addUser, addItemToSellerInventory, addReport, addBook, getReports
+module.exports = {addUser, addItemToSellerInventory, addReport, addBook, getReports, getStoreInventory
 };
