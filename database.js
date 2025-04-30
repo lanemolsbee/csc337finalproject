@@ -100,120 +100,36 @@ async function addBook(db, query){
 			throw new Error("Failed to add the book to the database.");
 		}
 	}
-	
-
-
-/**
- * This function will get the purchases associated with a given buyer.
- * 
- * @param {Object} db 
- * @param {String} username is the username of the user to be queried
- * @return - the array of purchases associated with a user
- */
-function getPurchases(db, username){
 	/**
-	 * 
-	 * For this function, you will work with the buyers collection.
-	 * You want to retrieve the purchases array associated with teh username
+	 * This function returns an array consiting of the store's inventory
+	 * @param db - The database to draw from
+	 * @returns the array of all the items in the database
 	 */
-
-		if (!username) {
-			throw new Error("Username is required to retrieve purchases.");
+	async function getStoreInventory(db){
+		try{
+			const collection = db.collection('listings');
+			const inventory = await collection.find({}).toArray();
+			return inventory;
 		}
-	
-		// Return a promise for the retrieval of purchases
-		return db.collection("buyers").findOne({ username: username })
-			.then(user => {
-				// If the user is not found, throw an error
-				if (!user) {
-					throw new Error(`No buyer found with username: ${username}`);
-				}
-	
-				// Return the purchases array associated with the user
-				return user.purchases || [];
-			})
-			.catch(error => {
-				console.error("Error retrieving purchases:", error);
-				throw new Error("Failed to retrieve purchases for the user.");
-			});
+		catch(err){
+			console.log(err);
+		}
 	}
-	
-	
-
-
 /**
- * This function will get the inventory associated with a given seller.
- * @param {Object} db - the database to be interacted with
- * @param {String} username is the username of the seller to be queried
- * @return - an array of the books in the inventory
+ * This function gets the list of reports from the database.
+ * @param db - the database to interact with
+ * @returns the array of reports in the database
  */
-function getInventory(db, username){
-	/**
-	 * Similar to getPUrchases, but you use the sellers collection
-	 * 'and return the inventory array associated with the username
-	 */
-	
-		if (!username) {
-			throw new Error("Username is required to retrieve inventory.");
-		}
-	
-		// Return a promise for the inventory retrieval
-		return db.collection("sellers").findOne({ username: username })
-			.then(seller => {
-				// If the seller is not found, throw an error
-				if (!seller) {
-					throw new Error(`No seller found with username: ${username}`);
-				}
-	
-				// Return the inventory array associated with the seller
-				return seller.inventory || [];
-			})
-			.catch(error => {
-				console.error("Error retrieving inventory:", error);
-				throw new Error("Failed to retrieve inventory for the seller.");
-			});
+async function getReports(db){
+	try{
+		const collection = db.collection('reports');
+		const reports = await collection.find({}).toArray();
+		return reports
+	}catch(err){
+		console.log(err);
 	}
+}
 	
-	
-
-/**
- * This function will remove an item from a given sellerss inventory
- * @param {Object} db 
- * @param {String} username is the username of the seller to be queried
- * @param {String} bookTitle is thetitle of the book to be removed
- */
-function removeItemFromSellerInventory(db, username, bookTitle, price){
-	/**
-	 * You will work with the sellers collection again, 
-	 * but this time you will remove an item from the inventory array
-	 * associated with the username in the database
-	 */
-		if (!username || !bookTitle) {
-			throw new Error("Username and bookTitle are required to remove an item from the inventory.");
-		}
-	
-		// Construct the item to be removed
-		const itemToRemove = { title: bookTitle, price: price };
-	
-		// Return a promise for the inventory update
-		return db.collection("sellers").updateOne(
-			{ username: username }, // Find the seller by username
-			{ $pull: { inventory: itemToRemove } } // Remove the matching item from the inventory array
-		)
-		.then(result => {
-			if (result.modifiedCount === 0) {
-				throw new Error(`No matching item found in the inventory for username: ${username}`);
-			}
-			console.log("Item successfully removed from inventory.");
-			return result;
-		})
-		.catch(error => {
-			console.error("Error removing item from inventory:", error);
-			throw new Error("Failed to remove the item from the seller's inventory.");
-		});
-	}
-	
-
 /**
  * This function will add an item to a given sellerss inventory.
  * @param {Object} db 
@@ -221,35 +137,13 @@ function removeItemFromSellerInventory(db, username, bookTitle, price){
  * @param {String} bookTitle is the title of the book to be added
  */
 function addItemToSellerInventory(db, username, bookTitle, price){
-
+	
 	
 }
 
 
 
-/**
- * This function will remove an item from the store. 
- * @param {Object} db - the database this function interacts with
- * @param {String} bookTitle - the title of the book to be removed from teh store. 
- */
-function removeItemFromStore(db, bookTitle){
-	/**
-	 * This works with teh collection "listings" and removes the boook with the given title. 
-	 */
-}
 
-/**
- * This function will add an item to a given buyer's purchase list
- * @param {Object} db 
- * @param {String} username is the username of the buyer to be queried
- * @param {String} bookTitle is the title of the book to be added
- */
-function addBookToBuyerPurchases(db, username, bookTitle){
-	/**
-	 * Thsi function works with the buyers collection and adds a book 
-	 * to the buyer associated with username's purchase list
-	 */
-}
 /**
  * This function adds a report to the database. 
  * @param {Object} db - This is the database the function interacts with
@@ -263,6 +157,5 @@ function addReport(db, reportQuery){
 	 */
 }
 
-module.exports = {addUser, getPurchases, getInventory, removeItemFromSellerInventory, 
-	addItemToSellerInventory, addBookToBuyerPurchases, addReport, addBook, removeItemFromStore
+module.exports = {addUser, addItemToSellerInventory, addReport, addBook, getReports
 };

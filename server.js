@@ -135,10 +135,7 @@ async function startServer(){
                 var htmlContent = getHTMLContent('success.html');
                 resEnd(res, htmlContent);
             }
-            //Serve listings.html, AKA a seller's inventory
-            else if(req.url.includes('listings')){
-                
-            }
+            
             //Serve store.html, which is the contents of the store as it exists now
             else if(req.url.includes("store")){
                 res.writeHead(200, {'Content-Type': 'text/html'});
@@ -229,13 +226,64 @@ function updateUrls(){
                     resEnd(res, htmlContent);
                 })
             }
-            //Serve user-purchases.html, the user's purchase history
-            else if(req.url.includes('purchase-history')){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-            }
+            
             //Serve admin_reports.html, the list of reports for Admins to view
             else if(req.url.includes('view-reports')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
+                var reports = getReports();
+                res.end(`<!--This will be the store page-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Reports</title>
+		<script src="source.js"></script>
+		<script>
+			/**
+ * This function updates the URLs for all the links on a page. 
+ */
+function updateUrls(){
+    var username = window.localStorage.getItem('username')
+    var role = window.localStorage.getItem("role")
+    if(username!=null && role!=null){
+        var alist = document.getElementsByTagName('a')
+        for(var i=0;i<alist.length;i++)
+        {
+            var par = '?username=' + username + "&role=" + role;
+            alist[i].href += par
+        }
+    }
+}
+		</script>
+	</head>
+	<body onload="updateUrls()">
+		<a href="#" onclick="sendReq('logout')">Logout</a>
+		<table id="storeListings">
+			<tr>
+				<td>Name</td>
+				<td>Email</td>
+                <td>Message</td?
+			</tr>
+		</table>
+		<script>
+			var items = ${reports}
+			var table = document.getElementById('storeListings');
+			for(var i = 0; i < items.length; i++){
+				var tr = document.createElement('tr');
+				var td1 = document.createElement('td');
+				var td2 = document.createElement('td');
+                var td3 = document.createElement('td');
+				td1.innerHTML = items[i].name;
+				td2.innerHTML = items[i].email;
+                td3.innerHTML = items[i].message;
+				tr.appendChild(td1);
+				tr.appendChild(td2);
+                tr.appendChild(td3);
+				table.appendChild(tr);
+			}
+		</script>
+	</body>
+</html>`);
+
             }
             //Serve source.js for linking between pages
             else if(req.url.includes('source.js')){
