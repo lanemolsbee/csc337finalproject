@@ -64,7 +64,7 @@ async function startServer(){
         await client.connect()
         console.log("Connected to MongoDB");
         db = client.db('userDB');
-        const server = http.createServer(function(req, res){
+        const server = http.createServer(async function(req, res){
             res.writeHead(200, {'Content-Type': 'text/html'});
             //Serve index.html
             if(req.url == '/'){
@@ -139,8 +139,8 @@ async function startServer(){
             //Serve store.html, which is the contents of the store as it exists now
             else if(req.url.includes("store")){
                 res.writeHead(200, {'Content-Type': 'text/html'});
-                var storeContents = getStoreInventory();
-                res.end(`<!--This will be the store page-->
+                var storeContents = await getStoreInventory();
+                res.end(`
 <!DOCTYPE html>
 <html>
 	<head>
@@ -169,8 +169,8 @@ function updateUrls(){
 		<a href="#" onclick="sendReq('store')">Store</a>
 		<table id="storeListings">
 			<tr>
-				<td>Title</th>
-				<td>Price</th>
+				<td>Title</td>
+				<td>Price</td>
 			</tr>
 		</table>
 		<script>
@@ -179,7 +179,7 @@ function updateUrls(){
 			for(var i = 0; i < items.length; i++){
 				var tr = document.createElement('tr');
 				var td1 = document.createElement('td');
-				var rd2 = document.createElement('td');
+				var td2 = document.createElement('td');
 				td1.innerHTML = items[i].title;
 				td2.innerHTML = items[i].price;
 				tr.appendChild(td1);
@@ -230,7 +230,7 @@ function updateUrls(){
             //Serve admin_reports.html, the list of reports for Admins to view
             else if(req.url.includes('view-reports')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
-                var reports = getReports();
+                var reports = database.getReports();
                 res.end(`<!--This will be the store page-->
 <!DOCTYPE html>
 <html>
@@ -261,7 +261,7 @@ function updateUrls(){
 			<tr>
 				<td>Name</td>
 				<td>Email</td>
-                <td>Message</td?
+                <td>Message</td>
 			</tr>
 		</table>
 		<script>
