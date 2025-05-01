@@ -18,49 +18,15 @@
 
 </style>
 <script src="source.js"></script>
-<script>
-    
-async function saveUser(event) {
-    event.preventDefault();
 
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
-    const role = document.querySelector('input[name="role"]:checked')?.value;
-
-    if (username && password && role) {
-        const response = await fetch('/log-in-action', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: `name=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&role=${encodeURIComponent(role)}`
-        });
-
-        const result = await response.text();
-
-        if (response.ok && (result === 'buyer' || result === 'seller' || result === 'admin')) {
-            localStorage.setItem("username", username);
-            localStorage.setItem("role", role);
-
-            if (result === 'buyer') location.href = "/purchase-history";
-            else if (result === 'seller') location.href = "/inventory";
-            else location.href = "/reports";
-        } else {
-            alert("Invalid login credentials. Please try again.");
-        }
-    } else {
-        alert("Please fill out all fields");
-    }
-}
-
-
-</script>
 </head>
 <body>
 
      
 
     <h1>Welcome please login</h1>
-    <a href="#" onclick="sendReq('/')">Home</a>
-    <a href="#" onclick="sendReq('about')">About</a>
+    <a href="/home" onclick="sendReq('/home')">Home</a>
+    <a href="/about" onclick="sendReq('about')">About</a>
     
     <form action="log-in-action" method="post" onsubmit="saveUser(); return true">
         <label for="username">Username:</label>
@@ -76,7 +42,63 @@ async function saveUser(event) {
         <button type="submit">Submit</button>
     </form>
     Don't have an account? Click here!
-    <a href="/create_user">Create User</a>
+    <a href="/create_user" onclick="sendReq('create_user')">Create User</a>
+    <script>
+    
+    async function saveUser(event) {
+      event.preventDefault();
+
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const role = document.querySelector('input[name="role"]:checked')?.value;
+
+      if (username && password && role) {
+        const response = await fetch('/log-in-action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `name=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&role=${encodeURIComponent(role)}`
+        });
+
+        const result = await response.text();
+
+        if (response.ok && (result === 'buyer' || result === 'seller' || result === 'admin')) {
+          localStorage.setItem("username", username);
+          localStorage.setItem("role", role);
+
+          // Give localStorage time to persist before redirecting
+          setTimeout(() => {
+
+          }, 100);
+        } else {
+          alert("Invalid login credentials. Please try again.");
+        }
+      } else {
+        alert("Please fill out all fields.");
+      }
+    }
+
+    function updateUrls() {
+      const username = localStorage.getItem('username');
+      const role = localStorage.getItem('role');
+      if (username && role) {
+        const alist = document.getElementsByTagName('a');
+        for (let i = 0; i < alist.length; i++) {
+          const a = alist[i];
+          const url = new URL(a.href, window.location.origin);
+          url.searchParams.set('username', username);
+          url.searchParams.set('role', role);
+          a.href = url.toString();
+        }
+      }
+    }
+
+    window.onload = function () {
+      updateUrls();
+      document.getElementById("loginForm").addEventListener("submit", saveUser);
+    };
+        
+        
+        </script>
     
     
 

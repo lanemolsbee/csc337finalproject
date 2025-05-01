@@ -67,9 +67,8 @@ async function startServer(){
         console.log("Connected to MongoDB");
         db = client.db('userDB');
         const server = http.createServer(async function(req, res){
-            console.log(`[DEBUG] METHOD: ${req.method}, URL: ${req.url}`);
             //Serve index.html
-            if(req.url == '/'){
+            if(req.url.includes('/home') || req.url == '/'){
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('index.html');
                 resEnd(res, htmlContent);
@@ -115,21 +114,27 @@ async function startServer(){
 			/**
  * This function updates the URLs for all the links on a page. 
  */
-function updateUrls(){
-    var username = window.localStorage.getItem('username')
-    var role = window.localStorage.getItem("role")
-    if(username!=null && role!=null){
-        var alist = document.getElementsByTagName('a')
-        for(var i=0;i<alist.length;i++)
-        {
-            var par = '?username=' + username + "&role=" + role;
-            alist[i].href += par
+function updateUrls() {
+      const username = localStorage.getItem('username');
+      const role = localStorage.getItem('role');
+      if (username && role) {
+        const alist = document.getElementsByTagName('a');
+        for (let i = 0; i < alist.length; i++) {
+          const a = alist[i];
+          const url = new URL(a.href, window.location.origin);
+          url.searchParams.set('username', username);
+          url.searchParams.set('role', role);
+          a.href = url.toString();
         }
+      }
     }
-}
+    window.onload = function(){
+      updateUrls();
+    }
+
 		</script>
 	</head>
-	<body onload="updateUrls()">
+	<body>
 		<a href="#" onclick="sendReq('logout')">Logout</a>
 		<table id="storeListings">
 			<tr>
@@ -174,21 +179,27 @@ function updateUrls(){
 			/**
  * This function updates the URLs for all the links on a page. 
  */
-function updateUrls(){
-    var username = window.localStorage.getItem('username')
-    var role = window.localStorage.getItem("role")
-    if(username!=null && role!=null){
-        var alist = document.getElementsByTagName('a')
-        for(var i=0;i<alist.length;i++)
-        {
-            var par = '?username=' + username + "&role=" + role;
-            alist[i].href += par
+function updateUrls() {
+      const username = localStorage.getItem('username');
+      const role = localStorage.getItem('role');
+      if (username && role) {
+        const alist = document.getElementsByTagName('a');
+        for (let i = 0; i < alist.length; i++) {
+          const a = alist[i];
+          const url = new URL(a.href, window.location.origin);
+          url.searchParams.set('username', username);
+          url.searchParams.set('role', role);
+          a.href = url.toString();
         }
+      }
     }
-}
+    window.onload = function(){
+      updateUrls();
+    }
+
 		</script>
 	</head>
-	<body onload="updateUrls()">
+	<body>
 		<a href="#" onclick="sendReq('logout')">Logout</a>
 		<table id="storeListings">
 			<tr>

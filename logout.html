@@ -21,6 +21,10 @@ to link to the server for a logout-->
 <body>
     <h1>Logout</h1>
     <p class="message">You have been successfully logged out.</p>
-    <a class="link" href="index.html">Back to Home</a>
+    <script>
+        window.localStorage.removeItem('username')
+        window.localStorage.removeItem('role')
+    </script>
+    <a href="#" onclick="sendReq('home')">Back to Home</a>
 </body>
 </html>
