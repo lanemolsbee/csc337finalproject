@@ -48,7 +48,7 @@ function updateUrls(){
 			</tr>
 		</table>
 		<script>
-			var items = ${storeContents}
+		var items = ${storeContents}
 			var table = document.getElementById('storeListings');
 			for(var i = 0; i < items.length; i++){
 				var tr = document.createElement('tr');
@@ -58,8 +58,8 @@ function updateUrls(){
 				td2.innerHTML = items[i].price;
 				tr.appendChild(td1);
 				tr.appendChild(td2);
-				table.appendChild(tr);
-			}
+				table.appendChild(tr);}
+			
 		</script>
 	</body>
-</html>
+</html> 
