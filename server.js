@@ -15,7 +15,8 @@ var auth = require('./auth.js')
 var database = require('./database.js')
 var {MongoClient} = require('mongodb')
 var client = new MongoClient('mongodb://localhost:27017/userDB');
-let db;
+let db; 
+
 
 /**
  * This function synchronously reads the contents of fileName and returns those contents
@@ -60,13 +61,14 @@ async function getStoreInventory(){
  * the server to the MongoDB database
  */
 async function startServer(){
+    
     try{
         await client.connect()
         console.log("Connected to MongoDB");
         db = client.db('userDB');
         const server = http.createServer(async function(req, res){
+            console.log(`[DEBUG] METHOD: ${req.method}, URL: ${req.url}`);
             //Serve index.html
-            console.log(req.url);
             if(req.url == '/'){
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 var htmlContent = getHTMLContent('index.html');
@@ -84,7 +86,7 @@ async function startServer(){
                 var htmlContent = getHTMLContent('login.html');
                 resEnd(res, htmlContent);
             }
-            else if(req.url.includes('login-form')){
+            else if(req.url.includes('log-in-action')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
                 var body = ''
                 req.on('data', function(s){
@@ -92,64 +94,18 @@ async function startServer(){
                 });
                 req.on('end', async function(){
                     var query = qs.parse(body);
-                    var canLogin = await auth.checkLogin(db, query.name, auth.hashPassword(query.password), query.role);
+                    var canLogin = await auth.checkLogin(db, query.username, query.password, query.role);
                     if(canLogin){
                         if(query.role == 'buyer'){
-                            var htmlContent = getHTMLContent('user-purchases.html');
-                            req.url = '/purchase-history';
-                        }else if(query.role == 'seller'){
-                            var htmlContent = getHTMLContent('listings.html');
-                            req.url = "/inventory";
-                        }else{
-                            var htmlContent = getHTMLContent('admin_reports.html');
-                            req.url = '/reports';
-                        }
-                        res.end(htmlContent);
-                    }else{
-                        res.end(getHTMLContent('login.html') + '<p>Invalid login credenetials, please try again</p>')
-                    }
-                })
-            }
-            //Serve report.html and the associated form action
-            else if(req.url.includes('create_user')){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                var htmlContent = getHTMLContent('create_user.html');
-                resEnd(res, htmlContent);
-            }
-            else if(req.url.includes('create_user_submit')){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                let body = '';
-                req.on('data', chunk => {
-                    console.log('Chunk received: ', chunk);
-                    body += chunk
-                });
-                req.on('end', async () => {
-                    try{
-                        const parsed = qs.parse(body);
-                        console.log('Parsed data:', parsed);
-                        await database.addUser(db, parsed);
-                        var htmlContent = getHTMLContent('success.html');
-                        resEnd(res, htmlContent);
-                    }catch(err){
-                        console.error('Error submitting report: ', err);
-                        res.end('<h1>Failed to submit report.</h1>');
-                    }
-                    
-                });
-            }
-            
-            //Serve success.html
-            else if(req.url.includes('success')){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                var htmlContent = getHTMLContent('success.html');
-                resEnd(res, htmlContent);
-            }
-            
-            //Serve store.html, which is the contents of the store as it exists now
-            else if(req.url.includes("store")){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                var storeContents = await getStoreInventory();
-                res.end(`
+                            var storeContents = await getStoreInventory();
+                            if(storeContents.length == 0){
+                                res.end('The store is currently empty');
+                            }
+                            var items = JSON.stringify(storeContents);
+                            if(storeContents.length == 0){
+
+                            }
+                            res.end(`
 <!DOCTYPE html>
 <html>
 	<head>
@@ -174,8 +130,7 @@ function updateUrls(){
 		</script>
 	</head>
 	<body onload="updateUrls()">
-		<a href="#" onclick="sendReq('purchase-history')">Purchase History</a>
-		<a href="#" onclick="sendReq('store')">Store</a>
+		<a href="#" onclick="sendReq('logout')">Logout</a>
 		<table id="storeListings">
 			<tr>
 				<td>Title</td>
@@ -183,7 +138,7 @@ function updateUrls(){
 			</tr>
 		</table>
 		<script>
-			var items = ${storeContents}
+			var items = ${items}
 			var table = document.getElementById('storeListings');
 			for(var i = 0; i < items.length; i++){
 				var tr = document.createElement('tr');
@@ -198,8 +153,115 @@ function updateUrls(){
 		</script>
 	</body>
 </html>`);
-
+                            //var htmlContent = getHTMLContent('user-purchases.html');
+                            //req.url = '/purchase-history';
+                        }else if(query.role == 'seller'){
+                            var htmlContent = getHTMLContent('upload-book.html');
+                            resEnd(res, htmlContent);
+                        }else{
+                            var reports = await database.getReports(db);
+                            if(reports.length == 0){
+                                res.end("There are currently no reports to view");
+                            }
+                            var reportItems  = JSON.stringify(reports);
+                            res.end(`<!--This will be the store page-->
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Reports</title>
+		<script src="source.js"></script>
+		<script>
+			/**
+ * This function updates the URLs for all the links on a page. 
+ */
+function updateUrls(){
+    var username = window.localStorage.getItem('username')
+    var role = window.localStorage.getItem("role")
+    if(username!=null && role!=null){
+        var alist = document.getElementsByTagName('a')
+        for(var i=0;i<alist.length;i++)
+        {
+            var par = '?username=' + username + "&role=" + role;
+            alist[i].href += par
+        }
+    }
+}
+		</script>
+	</head>
+	<body onload="updateUrls()">
+		<a href="#" onclick="sendReq('logout')">Logout</a>
+		<table id="storeListings">
+			<tr>
+				<td>Name</td>
+				<td>Email</td>
+                <td>Message</td>
+			</tr>
+		</table>
+		<script>
+			var items = ${reportItems}
+			var table = document.getElementById('storeListings');
+			for(var i = 0; i < items.length; i++){
+				var tr = document.createElement('tr');
+				var td1 = document.createElement('td');
+				var td2 = document.createElement('td');
+                var td3 = document.createElement('td');
+				td1.innerHTML = items[i].name;
+				td2.innerHTML = items[i].email;
+                td3.innerHTML = items[i].message;
+				tr.appendChild(td1);
+				tr.appendChild(td2);
+                tr.appendChild(td3);
+				table.appendChild(tr);
+			}
+		</script>
+	</body>
+</html>`
+);
+                            //var htmlContent = getHTMLContent('admin_reports.html');
+                            //req.url = '/reports';
+                        }
+                        //res.end(htmlContent);
+                    }else{
+                        res.end(getHTMLContent('login.html') + '<p>Invalid login credenetials, please try again</p>')
+                    }
+                })
             }
+            //Serve report.html and the associated form action
+            else if(req.url.includes('create_user')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                var htmlContent = getHTMLContent('create_user.html');
+                resEnd(res, htmlContent);
+            }
+            else if(req.url.includes('create_account_submit') && req.method === 'POST'){
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                let body = '';
+                req.on('data', chunk => {
+                    console.log('Chunk received: ', chunk);
+                    body += chunk
+                });
+                req.on('end', async () => {
+                    try{
+                        console.log('entered');
+                        const parsed = qs.parse(body);
+                        console.log('Parsed data:', parsed);
+                        await database.addUser(db, parsed);
+                        var htmlContent = getHTMLContent('success.html');
+                        resEnd(res, htmlContent);
+                    }catch(err){
+                        console.error('Error submitting report: ', err);
+                        res.end('<h1>Failed to submit report.</h1>');
+                    }
+                    
+                });
+            }
+            
+            //Serve success.html
+            else if(req.url.includes('success')){
+                res.writeHead(200, {'Content-Type': 'text/html'});
+                var htmlContent = getHTMLContent('success.html');
+                resEnd(res, htmlContent);
+            }
+            
             //Serve logout.html
             else if(req.url.includes('logout')){
                 res.writeHead(200, {'Content-Type': 'text/html'});
@@ -254,64 +316,6 @@ function updateUrls(){
                 })
             }
             
-            //Serve admin_reports.html, the list of reports for Admins to view
-            else if(req.url.includes('view-reports')){
-                res.writeHead(200, {'Content-Type': 'text/html'});
-                var reports = database.getReports();
-                res.end(`<!--This will be the store page-->
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>Reports</title>
-		<script src="source.js"></script>
-		<script>
-			/**
- * This function updates the URLs for all the links on a page. 
- */
-function updateUrls(){
-    var username = window.localStorage.getItem('username')
-    var role = window.localStorage.getItem("role")
-    if(username!=null && role!=null){
-        var alist = document.getElementsByTagName('a')
-        for(var i=0;i<alist.length;i++)
-        {
-            var par = '?username=' + username + "&role=" + role;
-            alist[i].href += par
-        }
-    }
-}
-		</script>
-	</head>
-	<body onload="updateUrls()">
-		<a href="#" onclick="sendReq('logout')">Logout</a>
-		<table id="storeListings">
-			<tr>
-				<td>Name</td>
-				<td>Email</td>
-                <td>Message</td>
-			</tr>
-		</table>
-		<script>
-			var items = ${reports}
-			var table = document.getElementById('storeListings');
-			for(var i = 0; i < items.length; i++){
-				var tr = document.createElement('tr');
-				var td1 = document.createElement('td');
-				var td2 = document.createElement('td');
-                var td3 = document.createElement('td');
-				td1.innerHTML = items[i].name;
-				td2.innerHTML = items[i].email;
-                td3.innerHTML = items[i].message;
-				tr.appendChild(td1);
-				tr.appendChild(td2);
-                tr.appendChild(td3);
-				table.appendChild(tr);
-			}
-		</script>
-	</body>
-</html>`);
-
-            }
             //Serve source.js for linking between pages
             else if(req.url.includes('source.js')){
                 res.writeHead(200, {'Content-Type': 'application/javascript'});

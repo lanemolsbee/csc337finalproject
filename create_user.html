@@ -63,7 +63,7 @@ body{
     </head>
     <body style="background-color: lightgray;">
         <div id="report-banner">
-            <h1>Report a Problem</h1>
+            <h1>Create an account</h1>
             <div id="nav-links">
                 <a href="#" onclick="sendReq('/')">Home</a>
                 <a href="#" onclick="sendReq('about')">About</a>
@@ -74,7 +74,7 @@ body{
         </div>
         <div id="main-content">
             <div class="form-container">
-                <form action="create_user_submit" method="POST">
+                <form action="/create_account_submit" method="POST">
                     <label for="name">Name: </label><input type="text" id="name" name="name"><br>
 					<label for="password">Password: </label><input type="password" id="password" name="password"><br>
 					<label for="role">Account Type: </label><input type="radio" name="role" id="buyer" value="buyer">Buyer 

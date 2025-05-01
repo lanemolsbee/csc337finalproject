@@ -28,11 +28,12 @@ async function addUser(db, query){
 		var collectionTitle;
 		if(query.role == 'buyer'){
 			collectionTitle = 'buyers';
-		} else if(query.role == 'sellers'){
+		} else if(query.role == 'seller'){
 			collectionTitle = 'sellers';
 		} else{
 			collectionTitle = 'admins';
 		}
+		console.log(collectionTitle);
 		//Get teh collection associated with the title of the collection worked with
 		const userCollection = db.collection(collectionTitle);
 		//Define the item to be added using the items in the query
