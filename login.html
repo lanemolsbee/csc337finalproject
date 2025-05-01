@@ -20,34 +20,37 @@
 <script src="source.js"></script>
 <script>
     
-async function saveUser(event){
-    event.preventDefault(); // Stop form submission
+async function saveUser(event) {
+    event.preventDefault();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
     const role = document.querySelector('input[name="role"]:checked')?.value;
 
     if (username && password && role) {
-        const response = await fetch('/create-user', {
+        const response = await fetch('/log-in-action', {
             method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ name: username, password: password, role: role })
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `name=${encodeURIComponent(username)}&password=${encodeURIComponent(password)}&role=${encodeURIComponent(role)}`
         });
 
-        if (response.ok) {
+        const result = await response.text();
+
+        if (response.ok && (result === 'buyer' || result === 'seller' || result === 'admin')) {
             localStorage.setItem("username", username);
             localStorage.setItem("role", role);
-            if(role === 'buyer') location.href = "/purchase-history";
-            else if(role === 'seller') location.href = "/inventory";
+
+            if (result === 'buyer') location.href = "/purchase-history";
+            else if (result === 'seller') location.href = "/inventory";
             else location.href = "/reports";
         } else {
-            const msg = await response.text();
-            alert("Server error: " + msg);
+            alert("Invalid login credentials. Please try again.");
         }
     } else {
         alert("Please fill out all fields");
     }
 }
+
 
 </script>
 </head>
@@ -59,15 +62,17 @@ async function saveUser(event){
     <a href="#" onclick="sendReq('/')">Home</a>
     <a href="#" onclick="sendReq('about')">About</a>
     
-    <form action="/login-form" method="post" onsubmit="saveUser(); return true">
+    <form action="log-in-action" method="post" onsubmit="saveUser(); return true">
         <label for="username">Username:</label>
         <input type="text" id="username" name="username"><br><br> </input>
         
         <label for="password">Password:</label>
-        <input type="password" id="password" name="role"><br><br> </input>
+        <input type="password" id="password" name="password"><br><br> </input>
         <label for="role">Role: </label>
-        <input type="radio" name="role" id="buyer">Buyer <input type="radio" name="seller" id="seller"> Seller
-        <input type="radio" name="role" id="admin"> Admin
+        <input type="radio" name="role" id="buyer" value="buyer">Buyer
+        <input type="radio" name="role" id="seller" value="seller"> Seller
+        <input type="radio" name="role" id="admin" value="admin"> Admin
+
         <button type="submit">Submit</button>
     </form>
     Don't have an account? Click here!

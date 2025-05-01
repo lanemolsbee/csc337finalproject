@@ -34,12 +34,22 @@ function hashPassword(password){
 async function checkLogin(db, username, password, role){
 	try{
 		const hashed = hashPassword(password);
-		const user = await db.collection('users').findOne({
+		var collectionName;
+		if(role == 'buyer'){
+			collectionName = 'buyers';
+		}
+		else if(role == 'seller'){
+			collectionName = 'sellers';
+		}else if(role == 'admin'){
+			collectionName = 'admins';
+		}else{
+			return false;
+		}
+		const user = await db.collection(collectionName).findOne({
 			username: username,
-			password: hashed,
-			role: role
+			password: hashed
 		});
-		return user != null;
+		return user != null
 	}catch(err){
 		console.log("Error during login check: ", err);
 		return false;
